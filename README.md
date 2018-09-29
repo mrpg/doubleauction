@@ -88,9 +88,11 @@ technically required.
 
 ## ToDo
 
-- market orders
-- immediate or cancel orders
-- proper messaging (to keep track of what happened to every order)
-- order deletion
+- implement Nasdaq OUCH. This also implies:
+  - market orders
+  - immediate or cancel orders
+  - proper messaging (to keep track of what happened to every order)
+  - order deletion
 - parallelization?
+- implement the BCS FBA
 - more testing
