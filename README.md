@@ -77,8 +77,8 @@ script to plot curves like the above, `etc/graph.R`. Sadly, the latter
 still contains some bugs that will likely not be fixed.
 
 doubleauction has been tested with up to 200 million orders (approximately
-half of which were buy orders). The correct equilibrium was found after
-119 seconds.
+half of which were buy orders). In this case, the correct equilibrium was
+found after 71 seconds.
 
 ## Licensing
 
@@ -88,7 +88,6 @@ technically required.
 
 ## ToDo
 
-- sort order book in place
 - market orders
 - immediate or cancel orders
 - proper messaging (to keep track of what happened to every order)

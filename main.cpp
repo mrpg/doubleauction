@@ -91,25 +91,23 @@ std::tuple<bool, PRICE, QUANTITY> is_feasible(const MARKET& market, QUANTITY tri
 	return std::make_tuple(false, 0, 0);
 }
 
-std::tuple<MARKET, bool, PRICE, QUANTITY> double_auction(const MARKET& market, std::function<PRICE(PRICE, PRICE)> pricing) {
+std::tuple<bool, PRICE, QUANTITY> double_auction(MARKET& market, std::function<PRICE(PRICE, PRICE)> pricing) {
 	if (market.first.size() == 0 || market.second.size() == 0) {
-		return std::make_tuple(market, false, 0, 0);
+		return std::make_tuple(false, 0, 0);
 	}
-
-	MARKET nmarket = market;
 
 	// sort both orderbooks
 
-	sort_orderbooks(nmarket);
+	sort_orderbooks(market);
 
 	// determine clearing price:
 
 	// find all possible quantities in equilibrium...
 
 	std::vector<QUANTITY> qcum;
-	qcum.reserve(nmarket.first.size()+nmarket.second.size());
+	qcum.reserve(market.first.size()+market.second.size());
 
-	for (const ORDERBOOK* ob: {&nmarket.first, &nmarket.second}) {
+	for (const ORDERBOOK* ob: {&market.first, &market.second}) {
 		bool newob = true;
 
 		for (const ORDER& cur: *ob) {
@@ -133,7 +131,7 @@ std::tuple<MARKET, bool, PRICE, QUANTITY> double_auction(const MARKET& market, s
 
 	while (region_b-region_a > 3) {
 		trial = (region_a+region_b)/2;
-		eq = is_feasible(nmarket, qcum[trial], pricing);
+		eq = is_feasible(market, qcum[trial], pricing);
 
 		if (std::get<0>(eq)) {
 			region_b = trial;
@@ -144,7 +142,7 @@ std::tuple<MARKET, bool, PRICE, QUANTITY> double_auction(const MARKET& market, s
 	}
 
 	for (size_t j = region_a; j <= region_b; j++) {
-		eq = is_feasible(nmarket, qcum[j], pricing);
+		eq = is_feasible(market, qcum[j], pricing);
 
 		if (j == region_a && region_b != region_a) assert(!std::get<0>(eq)); // todo?
 
@@ -154,9 +152,9 @@ std::tuple<MARKET, bool, PRICE, QUANTITY> double_auction(const MARKET& market, s
 	// transact...
 
 	if (std::get<0>(eq)) { // equilibrium exists
-		assert(!std::get<0>(is_feasible(nmarket, next(std::get<2>(eq)), pricing))); // assert optimality
+		assert(!std::get<0>(is_feasible(market, next(std::get<2>(eq)), pricing))); // assert optimality
 
-		for (ORDERBOOK* ob: {&nmarket.first, &nmarket.second}) {
+		for (ORDERBOOK* ob: {&market.first, &market.second}) {
 			QUANTITY q_req = std::get<2>(eq);
 
 			for (ORDER& cur: *ob) {
@@ -182,7 +180,7 @@ std::tuple<MARKET, bool, PRICE, QUANTITY> double_auction(const MARKET& market, s
 
 	// and return new order book...
 
-	return std::tuple_cat(std::make_tuple(nmarket), eq);
+	return eq;
 }
 
 void print_market(const MARKET& market, std::ostream& out) {
@@ -249,11 +247,10 @@ int main(int argc, char** argv) {
 	auto eq = double_auction(market, split_the_difference);
 	auto elapsed = deltaT(t1, now());
 
-	market = std::get<0>(eq);
 	print_market(market, std::cout);
 
-	if (std::get<1>(eq)) {
-		std::cerr << "Equilibrium found at p=" << std::get<2>(eq) << ", q=" << std::get<3>(eq) << '.' << std::endl;
+	if (std::get<0>(eq)) {
+		std::cerr << "Equilibrium found at p=" << std::get<1>(eq) << ", q=" << std::get<2>(eq) << '.' << std::endl;
 	}
 	else {
 		std::cerr << "No equilibrium found." << std::endl;
