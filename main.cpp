@@ -35,8 +35,8 @@
 typedef uintmax_t PRICE; // to be imposed by regulator
 typedef intmax_t QUANTITY;
 
-constexpr QUANTITY next(QUANTITY x) {
-	return (std::is_floating_point<QUANTITY>::value) ? nextafter(x, x+1) : x+1;
+inline QUANTITY next(QUANTITY x) {
+	return x+1;
 }
 
 typedef struct order {

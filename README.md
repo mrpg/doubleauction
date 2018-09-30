@@ -51,10 +51,11 @@ and some other information is output to stderr. (Thus, theoretically, you
 can pipe several instances of `doubleauction` together -- and if my code
 is correct, no equilibrium should ever be found after the first stage.)
 
-This program asserts optimality (i.e. there is no higher feasible quantity)
-and feasibility (i.e. individual rationality when transacting at some price)
-and aborts if they are not met. Still, there is no guarantee and use of
-this program is entirely without warranty.
+This program asserts *feasibility* (i.e. individual rationality when
+transacting at some price) and approximate *optimality* (i.e. there is no
+higher feasible quantity) and aborts if they are not met. If quantity is
+integral, the optimality check is exact. Still, there is no guarantee and
+use of this program is entirely without warranty.
 
 ## Example markets
 
